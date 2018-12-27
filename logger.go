@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/google/uuid"
+	"github.com/teris-io/shortid"
 )
 
 // LogFormatFn overloads the logging log.fmt(string, format)
@@ -16,15 +16,17 @@ type LogFn func(...interface{})
 // LogProvider represents an entity that can log. All logged statements will be formatted
 // with the identity of the LogProvider
 type LogProvider struct {
-	id     uuid.UUID
+	id     string
 	name   string
 	prefix string
 }
 
+var sid, _ = shortid.New(1, shortid.DEFAULT_ABC, 2342)
+
 // InitLog initializes the LogProvider
 func (lP *LogProvider) InitLog(name string) *LogProvider {
 	lP.name = name
-	lP.id = uuid.New()
+	lP.id, _ = sid.Generate()
 
 	return lP
 }
@@ -40,7 +42,7 @@ func (lP LogProvider) Identifier() string {
 	identifier := lP._identifier()
 
 	if lP.prefix != "" {
-		identifier = fmt.Sprintf("%s|%s", lP.prefix, identifier)
+		identifier = fmt.Sprintf("%s>%s", lP.prefix, identifier)
 	}
 
 	return identifier

@@ -2,16 +2,19 @@
 
 
 [[projects]]
-  digest = "1:236d7e1bdb50d8f68559af37dbcf9d142d56b431c9b2176d41e2a009b664cda8"
-  name = "github.com/google/uuid"
+  digest = "1:c08f5d8cc28ed4dccb098121d5f1f19f708bf04e3bbd4b772ce6461de6ef1ca2"
+  name = "github.com/teris-io/shortid"
   packages = ["."]
   pruneopts = "UT"
-  revision = "9b3b1e0f5f99ae461456d768e7d301a7acdaa2d8"
-  version = "v1.1.0"
+  revision = "6c56cef5189ca1b3d5ef01dc07f4d611dfc0bb33"
+  version = "v1.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = ["github.com/google/uuid"]
+  input-imports = [
+    "github.com/mgagliardo91/go-utils",
+    "github.com/teris-io/shortid",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
