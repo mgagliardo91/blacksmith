@@ -2,7 +2,6 @@ package blacksmith
 
 import (
 	"github.com/mgagliardo91/go-utils"
-	log "github.com/sirupsen/logrus"
 )
 
 // TaskName is an enumeration of jobs to execute
@@ -69,7 +68,7 @@ func (b *Blacksmith) SetHandler(taskName TaskName, taskHandler TaskHandler) *Bla
 
 // Run starts the Blacksmith which will initialize the workers
 func (b *Blacksmith) Run() *Blacksmith {
-	b.LogfUsing(log.Tracef, "Starting %v workers\n", b.maxWorkers)
+	b.LogfUsing(GetLogger().Tracef, "Starting %v workers\n", b.maxWorkers)
 	for i := 0; i < b.maxWorkers; i++ {
 		worker := Worker{
 			workerPool:  b.workerPool,
@@ -89,7 +88,7 @@ func (b *Blacksmith) Run() *Blacksmith {
 
 // Stop shuts down the Blacksmith which will wait for all workers to complete
 func (b *Blacksmith) Stop() *Blacksmith {
-	b.LogUsing(log.Trace, "Received request to stop")
+	b.LogUsing(GetLogger().Trace, "Received request to stop")
 	b.stopChannel.RequestStop()
 	b.Log("Blacksmith stopped.")
 	return b
@@ -107,16 +106,16 @@ func (b *Blacksmith) dispatch() {
 			go func(job Task) {
 				taskChannel := <-b.workerPool
 
-				b.LogfUsing(log.Tracef, "Dispatching Task: %+v\n", job)
+				b.LogfUsing(GetLogger().Tracef, "Dispatching Task: %+v\n", job)
 				taskChannel <- job
 			}(job)
 		case <-b.stopChannel.OnRequest:
 			go func() {
-				b.LogUsing(log.Trace, "Closing all workers")
+				b.LogUsing(GetLogger().Trace, "Closing all workers")
 				for _, worker := range b.workers {
 					worker.stop()
 				}
-				b.LogUsing(log.Trace, "Quitting")
+				b.LogUsing(GetLogger().Trace, "Quitting")
 				b.stopChannel.Stop()
 			}()
 		}
@@ -134,12 +133,12 @@ func (b *Blacksmith) executeTask(task Task) {
 	if t != nil {
 		t(task)
 	} else {
-		b.LogfUsing(log.Tracef, "Cannot locate task handler for task name: %s", task.TaskName)
+		b.LogfUsing(GetLogger().Tracef, "Cannot locate task handler for task name: %s", task.TaskName)
 	}
 }
 
 func (worker Worker) start(taskHandler TaskHandler) {
-	worker.LogUsing(log.Trace, "Started")
+	worker.LogUsing(GetLogger().Trace, "Started")
 	go func() {
 		for {
 			worker.workerPool <- worker.taskChannel
@@ -147,10 +146,10 @@ func (worker Worker) start(taskHandler TaskHandler) {
 			select {
 			case task := <-worker.taskChannel:
 				task.InitLog("Task").SetPrefix(worker.Identifier())
-				worker.LogfUsing(log.Tracef, "Processing task %+v\n", task)
+				worker.LogfUsing(GetLogger().Tracef, "Processing task %+v\n", task)
 				taskHandler(task)
 			case <-worker.stopChannel.OnRequest:
-				worker.LogUsing(log.Trace, "Quitting")
+				worker.LogUsing(GetLogger().Trace, "Quitting")
 				worker.stopChannel.Stop()
 				return
 			}

@@ -25,6 +25,8 @@
 #   unused-packages = true
 
 
+ignored = ["github.com/mgagliardo91/go-utils"]
+
 [prune]
   go-tests = true
   unused-packages = true

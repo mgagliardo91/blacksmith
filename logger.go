@@ -3,17 +3,21 @@ package blacksmith
 import (
 	"fmt"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/mgagliardo91/go-utils"
+
 	"github.com/teris-io/shortid"
 )
 
-// LogFormatFn overloads the logging log.fmt(string, format)
+// LoggerName is the name used by blacksmith for logging
+const LoggerName = "blacksmith-logger"
+
+// LogFormatFn overloads the logging GetLogger().fmt(string, format)
 type LogFormatFn func(string, ...interface{})
 
-// LogFn overloads the standard log.xx()
+// LogFn overloads the standard GetLogger().xx()
 type LogFn func(...interface{})
 
-// LogProvider represents an entity that can log. All logged statements will be formatted
+// LogProvider represents an entity that can GetLogger(). All logged statements will be formatted
 // with the identity of the LogProvider
 type LogProvider struct {
 	id     string
@@ -22,6 +26,7 @@ type LogProvider struct {
 }
 
 var sid, _ = shortid.New(1, shortid.DEFAULT_ABC, 2342)
+var logger *utils.LogWrapper
 
 // InitLog initializes the LogProvider
 func (lP *LogProvider) InitLog(name string) *LogProvider {
@@ -31,7 +36,7 @@ func (lP *LogProvider) InitLog(name string) *LogProvider {
 	return lP
 }
 
-// SetPrefix passes a parent identity that will be logged at the start of each log statement
+// SetPrefix passes a parent identity that will be logged at the start of each GetLogger() statement
 func (lP *LogProvider) SetPrefix(prefix string) *LogProvider {
 	lP.prefix = prefix
 	return lP
@@ -62,9 +67,9 @@ func (lP LogProvider) buildLogPrefix() string {
 	return logStatement
 }
 
-// Logf prints the value and arguments using the standard log.Printf
+// Logf prints the value and arguments using the standard GetLogger().Printf
 func (lP LogProvider) Logf(value string, args ...interface{}) {
-	lP.LogfUsing(log.Printf, value, args...)
+	lP.LogfUsing(GetLogger().Printf, value, args...)
 }
 
 // LogfUsing prints the value and arguments using the provided LogFormatFn
@@ -73,9 +78,9 @@ func (lP LogProvider) LogfUsing(logFn LogFormatFn, value string, args ...interfa
 	logFn(logStatement, args)
 }
 
-// Log prints the value and arguments using the standard log.Println
+// Log prints the value and arguments using the standard GetLogger().Println
 func (lP LogProvider) Log(value string) {
-	lP.LogUsing(log.Println, value)
+	lP.LogUsing(GetLogger().Println, value)
 }
 
 // LogUsing prints the value and arguments using the provided LogFn
@@ -87,4 +92,12 @@ func (lP LogProvider) LogUsing(logFn LogFn, value string, args ...interface{}) {
 	} else {
 		logFn(logStatement)
 	}
+}
+
+func GetLogger() *utils.LogWrapper {
+	if logger == nil {
+		logger = utils.NewLogger(LoggerName)
+	}
+
+	return logger
 }
