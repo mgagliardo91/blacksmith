@@ -2,8 +2,8 @@ package blacksmith
 
 import (
 	"fmt"
-	"log"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/teris-io/shortid"
 )
 
