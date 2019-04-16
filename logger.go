@@ -25,7 +25,7 @@ type LogProvider struct {
 	prefix string
 }
 
-var sid, _ = shortid.New(1, shortid.DEFAULT_ABC, 2342)
+var sid, _ = shortid.New(1, shortid.DefaultABC, 2342)
 var logger *utils.LogWrapper
 
 // InitLog initializes the LogProvider
